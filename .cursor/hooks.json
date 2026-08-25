@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "hooks": {
+    "postToolUse": [
+      {
+        "command": "python .cursor/hooks/validate_prd.py",
+        "matcher": "Write",
+        "timeout": 30
+      }
+    ],
+    "afterFileEdit": [
+      {
+        "command": "python .cursor/hooks/validate_prd.py",
+        "timeout": 30
+      }
+    ]
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://project-context/init-project-context/deep-analysis.schema.json",
+  "title": "init-project-context Phase 2 deep analysis output",
+  "description": "Intermediate emitted by Phase 2 (Deep analysis) of /init-project-context. Phase 3 (Synthesis) consumes it to render CLAUDE.md, memories, and the Mermaid dependency graph. High-level only: nodes are projects / packages / module roots, never individual classes. The fallback.* flags record whether the preferred analyser was available per stack (only csharp + webforms have a non-grep preferred analyser today).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["rootPath", "fallback", "modules", "edges"],
+  "properties": {
+    "rootPath": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Absolute path to the analysed project root, mirroring discovery.rootPath."
+    },
+    "analysedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601 timestamp at which deep analysis completed. Optional but recommended for audit."
+    },
+    "notes": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Free-form diagnostic strings (e.g. \"roslyn CLI absent — used Grep fallback for C#\"). Optional."
+    },
+    "fallback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["csharp", "python", "typescript", "webforms"],
+      "properties": {
+        "csharp":     {"type": "boolean"},
+        "python":     {"type": "boolean"},
+        "typescript": {"type": "boolean"},
+        "webforms":   {"type": "boolean"}
+      },
+      "description": "Per-stack flag: true means the analysis used the Grep fallback because the preferred analyser was unavailable. csharp + webforms prefer the roslyn CLI; python + typescript have no preferred analyser yet, so their flag is always false."
+    },
+    "modules": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/module"},
+      "description": "Sorted lexicographically by id. Re-runs over the same tree must produce byte-identical JSON."
+    },
+    "edges": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/edge"},
+      "description": "Sorted lexicographically by (from, to, kind). Edges only connect modules present in modules[]."
+    }
+  },
+  "$defs": {
+    "module": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "stack", "path", "kind", "exports"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(csharp|python|typescript):.+$",
+          "description": "Stable identifier of the form `<stack>:<repo-relative-path>`. Unique across the modules array."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Display name (basename of the project / package / module root)."
+        },
+        "stack": {
+          "enum": ["csharp", "python", "typescript"],
+          "description": "Primary stack of the module. WebForms is NOT a separate module stack — webforms-hosting C# projects set webformsHost=true."
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Repo-relative root of the module with forward-slash separators."
+        },
+        "kind": {
+          "enum": ["project", "package", "module"],
+          "description": "project = C# .csproj. package = Python directory with __init__.py. module = TypeScript module root (directory with index.ts/main.ts or top-level src/ subdir)."
+        },
+        "exports": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1},
+          "description": "Sample of top-level public symbols (classes, functions, exports). Sorted lexicographically. Capped at 10 per module — this is for orientation, not enumeration."
+        },
+        "webformsHost": {
+          "type": "boolean",
+          "description": "Optional. Present and true on C# projects that host *.aspx pages (the WebForms front-end module of an AutoClone-family solution). Absent or false otherwise."
+        }
+      }
+    },
+    "edge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to", "kind"],
+      "properties": {
+        "from": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Module id of the source. Must match an entry in modules[]."
+        },
+        "to": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Module id of the target. Must match an entry in modules[]."
+        },
+        "kind": {
+          "enum": ["ProjectReference", "import"],
+          "description": "ProjectReference = C# <ProjectReference Include=\"...\"/>. import = Python `from X import …` / `import X` between known packages, or TypeScript `import … from \"…\"` between known modules."
+        }
+      }
+    }
+  }
+}

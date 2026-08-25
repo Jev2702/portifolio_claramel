@@ -1,0 +1,37 @@
+@import "tailwindcss";
+@config "../tailwind.config.ts";
+
+html {
+  scroll-behavior: smooth;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Nunito, sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: Poppins, sans-serif;
+}
+
+::selection {
+  background: var(--color-lavender);
+  color: var(--color-title);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}

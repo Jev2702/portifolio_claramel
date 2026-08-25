@@ -1,0 +1,4 @@
+{
+  "deprecated": true,
+  "note": "Claude Code hooks were replaced by Cursor-native .cursor/hooks.json. This file is not used by the Cursor Agent Discovery kit."
+}

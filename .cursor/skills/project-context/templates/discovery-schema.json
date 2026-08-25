@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://project-context/init-project-context/discovery.schema.json",
+  "title": "init-project-context Phase 1 discovery output",
+  "description": "Intermediate emitted by Phase 1 (Discovery) of /init-project-context. Phase 2 (Deep analysis) consumes it. The four stacks.* keys and three entryPoints.* keys are always present; absent stacks set detected=false with empty evidence.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["rootPath", "stacks", "entryPoints"],
+  "properties": {
+    "rootPath": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Absolute path to the scanned project root, normalised to str(Path.cwd())."
+    },
+    "scannedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601 timestamp at which discovery completed. Optional but recommended for audit."
+    },
+    "notes": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Free-form diagnostic strings (e.g. \"skipped Interface/legacy/ — exceeded soft deadline\"). Optional."
+    },
+    "stacks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["csharp", "python", "typescript", "webforms"],
+      "properties": {
+        "csharp":     {"$ref": "#/$defs/stackEntry"},
+        "python":     {"$ref": "#/$defs/stackEntry"},
+        "typescript": {"$ref": "#/$defs/stackEntry"},
+        "webforms":   {"$ref": "#/$defs/webformsEntry"}
+      }
+    },
+    "entryPoints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["csharp", "python", "typescript"],
+      "properties": {
+        "csharp":     {"$ref": "#/$defs/pathArray"},
+        "python":     {"$ref": "#/$defs/pathArray"},
+        "typescript": {"$ref": "#/$defs/pathArray"}
+      }
+    }
+  },
+  "$defs": {
+    "pathArray": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true,
+      "description": "Repo-relative paths with forward-slash separators. Sorted lexicographically; runs over the same tree must be byte-identical."
+    },
+    "stackEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["detected", "evidence"],
+      "properties": {
+        "detected": {"type": "boolean"},
+        "evidence": {"$ref": "#/$defs/pathArray"}
+      }
+    },
+    "webformsEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["detected", "evidence", "authMode"],
+      "properties": {
+        "detected": {"type": "boolean"},
+        "evidence": {"$ref": "#/$defs/pathArray"},
+        "authMode": {
+          "type": ["string", "null"],
+          "description": "Literal value of the <authentication mode=\"...\"> attribute when present (typically \"Forms\" for AutoClone-family repos). null if no <authentication> element was found in any Web.config."
+        }
+      }
+    }
+  }
+}

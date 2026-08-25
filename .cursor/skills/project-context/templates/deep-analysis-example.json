@@ -1,0 +1,68 @@
+{
+  "rootPath": "/d/Codes/LegalControl/AutoClone/LegalControl",
+  "analysedAt": "2026-05-06T18:35:00-03:00",
+  "notes": [
+    "roslyn CLI not on PATH — used Grep fallback for C# and WebForms"
+  ],
+  "fallback": {
+    "csharp": true,
+    "python": false,
+    "typescript": false,
+    "webforms": true
+  },
+  "modules": [
+    {
+      "id": "csharp:Domain/LC.Domain",
+      "name": "LC.Domain",
+      "stack": "csharp",
+      "path": "Domain/LC.Domain",
+      "kind": "project",
+      "exports": [
+        "AuthenticationDomain",
+        "PerfilDomain",
+        "UsuarioDomain"
+      ]
+    },
+    {
+      "id": "csharp:Infra/LC.Infra",
+      "name": "LC.Infra",
+      "stack": "csharp",
+      "path": "Infra/LC.Infra",
+      "kind": "project",
+      "exports": [
+        "ConnectionFactory",
+        "UsuarioRepository"
+      ]
+    },
+    {
+      "id": "csharp:Interface/LC.AU.Interface/LC.AU.Interface",
+      "name": "LC.AU.Interface",
+      "stack": "csharp",
+      "path": "Interface/LC.AU.Interface/LC.AU.Interface",
+      "kind": "project",
+      "exports": [
+        "Global",
+        "LoginPage",
+        "StateClass"
+      ],
+      "webformsHost": true
+    }
+  ],
+  "edges": [
+    {
+      "from": "csharp:Infra/LC.Infra",
+      "to": "csharp:Domain/LC.Domain",
+      "kind": "ProjectReference"
+    },
+    {
+      "from": "csharp:Interface/LC.AU.Interface/LC.AU.Interface",
+      "to": "csharp:Domain/LC.Domain",
+      "kind": "ProjectReference"
+    },
+    {
+      "from": "csharp:Interface/LC.AU.Interface/LC.AU.Interface",
+      "to": "csharp:Infra/LC.Infra",
+      "kind": "ProjectReference"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+graph LR
+  csharp_Domain_LC_Domain["LC.Domain"]
+  csharp_Infra_LC_Infra["LC.Infra"]
+  csharp_Interface_LC_AU_Interface_LC_AU_Interface[["LC.AU.Interface (WebForms host)"]]
+
+  csharp_Infra_LC_Infra --> csharp_Domain_LC_Domain
+  csharp_Interface_LC_AU_Interface_LC_AU_Interface --> csharp_Domain_LC_Domain
+  csharp_Interface_LC_AU_Interface_LC_AU_Interface --> csharp_Infra_LC_Infra

@@ -1,0 +1,37 @@
+{
+  "rootPath": "/d/Codes/LegalControl/AutoClone/LegalControl",
+  "scannedAt": "2026-05-06T18:30:00-03:00",
+  "stacks": {
+    "csharp": {
+      "detected": true,
+      "evidence": [
+        "Domain/LC.Domain/LC.Domain.csproj",
+        "Interface/LC.AU.Interface/LC.AU.Interface/LC.AU.Interface.csproj",
+        "LegalControl.sln"
+      ]
+    },
+    "python": {
+      "detected": false,
+      "evidence": []
+    },
+    "typescript": {
+      "detected": false,
+      "evidence": []
+    },
+    "webforms": {
+      "detected": true,
+      "evidence": [
+        "Interface/LC.AU.Interface/LC.AU.Interface/Web.config",
+        "Interface/LC.AU.Interface/LC.AU.Interface/login.aspx"
+      ],
+      "authMode": "Forms"
+    }
+  },
+  "entryPoints": {
+    "csharp": [
+      "Interface/LC.AU.Interface/LC.AU.Interface/Global.asax"
+    ],
+    "python": [],
+    "typescript": []
+  }
+}
