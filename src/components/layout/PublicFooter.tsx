@@ -1,6 +1,7 @@
 import logo from '../../assets/logo/claramel-logo.png'
 import { APP_CONFIG } from '../../config/app-config.ts'
 import { hasInstagram, instagramUrl } from '../../utils/whatsapp.ts'
+import { WhatsAppQuoteButton } from '../public/WhatsAppQuoteButton.tsx'
 
 export function PublicFooter() {
   return (
@@ -10,7 +11,8 @@ export function PublicFooter() {
           <img src={logo} alt="Claramel Artigos para festas" className="h-16 w-auto object-contain" />
           <p className="font-heading text-title tracking-tight">{APP_CONFIG.name}</p>
         </div>
-        <div className="text-textSecondary text-sm">
+        <div className="text-textSecondary text-sm flex flex-col items-center md:items-end gap-3">
+          <WhatsAppQuoteButton />
           <p>© ClaraMel</p>
           {hasInstagram() ? (
             <a

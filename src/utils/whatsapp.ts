@@ -8,9 +8,15 @@ export function hasInstagram(): boolean {
   return APP_CONFIG.instagram.length > 0
 }
 
+export function quoteWhatsAppUrl(themeName?: string): string {
+  const text = themeName
+    ? `Olá! Gostaria de fazer um orçamento do tema "${themeName}".`
+    : 'Olá! Gostaria de fazer um orçamento.'
+  return `https://wa.me/${APP_CONFIG.whatsapp}?text=${encodeURIComponent(text)}`
+}
+
 export function themeWhatsAppUrl(themeName: string): string {
-  const text = encodeURIComponent(`Olá! Gostaria de saber mais sobre o tema "${themeName}".`)
-  return `https://wa.me/${APP_CONFIG.whatsapp}?text=${text}`
+  return quoteWhatsAppUrl(themeName)
 }
 
 export function instagramUrl(): string {

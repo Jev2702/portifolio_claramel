@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { ThemeGrid } from '../../../components/public/ThemeGrid.tsx'
+import { WhatsAppQuoteButton } from '../../../components/public/WhatsAppQuoteButton.tsx'
 import { APP_CONFIG } from '../../../config/app-config.ts'
 import { useActiveThemes } from '../../../hooks/use-active-themes.ts'
 import { claramelGradients } from '../../../styles/theme.ts'
@@ -35,16 +36,11 @@ export function HomePage() {
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
                 to="/temas"
-                className="inline-flex items-center justify-center bg-secondary text-textOnPrimary rounded-full min-h-12 px-7 font-heading font-semibold"
+                className="inline-flex items-center justify-center border border-lavender text-title rounded-full min-h-12 px-7 font-semibold"
               >
                 Ver nossos temas
               </Link>
-              <a
-                href="#catalogo"
-                className="inline-flex items-center justify-center border border-lavender text-title rounded-full min-h-12 px-7 font-semibold"
-              >
-                Explorar catálogo
-              </a>
+              <WhatsAppQuoteButton />
             </div>
           </div>
           {featured[0] ? (

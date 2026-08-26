@@ -4,7 +4,7 @@ import { APP_CONFIG } from '../../../config/app-config.ts'
 import { getThemeBySlug } from '../../../services/themes/themes-service.ts'
 import type { Theme } from '../../../types/theme.ts'
 import { toUserMessage } from '../../../utils/user-messages.ts'
-import { hasWhatsApp, themeWhatsAppUrl } from '../../../utils/whatsapp.ts'
+import { WhatsAppQuoteButton } from '../../../components/public/WhatsAppQuoteButton.tsx'
 
 export function ThemeDetailsPage() {
   const { slug } = useParams()
@@ -139,16 +139,7 @@ export function ThemeDetailsPage() {
           ) : null}
           <h1 className="font-heading text-title text-4xl tracking-tight mt-2">{theme.name}</h1>
           <p className="text-text mt-5 leading-relaxed whitespace-pre-wrap">{theme.description}</p>
-          {hasWhatsApp() ? (
-            <a
-              href={themeWhatsAppUrl(theme.name)}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-8 inline-flex items-center justify-center bg-secondary text-textOnPrimary rounded-full min-h-12 px-7 font-heading font-semibold"
-            >
-              Quero saber mais
-            </a>
-          ) : null}
+          <WhatsAppQuoteButton themeName={theme.name} className="mt-8 inline-flex items-center justify-center gap-2 bg-secondary text-textOnPrimary rounded-full min-h-12 px-7 font-heading font-semibold" />
         </div>
       </div>
       {lightbox ? (

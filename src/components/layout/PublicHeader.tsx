@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import logo from '../../assets/logo/claramel-logo.png'
-import { APP_CONFIG } from '../../config/app-config.ts'
-import { hasWhatsApp } from '../../utils/whatsapp.ts'
+import { WhatsAppQuoteButton } from '../public/WhatsAppQuoteButton.tsx'
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   `min-h-12 inline-flex items-center px-3 text-sm font-semibold tracking-wide ${
@@ -25,16 +24,7 @@ export function PublicHeader() {
           <NavLink to="/temas" className={navLinkClass}>
             Temas
           </NavLink>
-          {hasWhatsApp() ? (
-            <a
-              href={`https://wa.me/${APP_CONFIG.whatsapp}`}
-              target="_blank"
-              rel="noreferrer"
-              className="ml-3 bg-secondary text-textOnPrimary rounded-full min-h-12 px-5 inline-flex items-center font-heading font-semibold"
-            >
-              WhatsApp
-            </a>
-          ) : null}
+          <WhatsAppQuoteButton className="ml-3 inline-flex items-center justify-center gap-2 bg-secondary text-textOnPrimary rounded-full min-h-12 px-5 font-heading font-semibold" />
         </nav>
         <button
           type="button"
@@ -61,16 +51,7 @@ export function PublicHeader() {
           <NavLink to="/temas" className={navLinkClass} onClick={() => setOpen(false)}>
             Temas
           </NavLink>
-          {hasWhatsApp() ? (
-            <a
-              href={`https://wa.me/${APP_CONFIG.whatsapp}`}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-2 bg-secondary text-textOnPrimary rounded-full min-h-12 px-5 inline-flex items-center font-heading font-semibold w-fit"
-            >
-              WhatsApp
-            </a>
-          ) : null}
+          <WhatsAppQuoteButton className="mt-2 inline-flex items-center justify-center gap-2 bg-secondary text-textOnPrimary rounded-full min-h-12 px-5 font-heading font-semibold w-fit" />
         </nav>
       ) : null}
     </header>

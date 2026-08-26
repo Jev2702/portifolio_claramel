@@ -1,4 +1,11 @@
-const whatsappNumber = (import.meta.env.VITE_WHATSAPP_NUMBER ?? '').trim()
+const DEFAULT_WHATSAPP_NUMBER = '5535984065306'
+
+function digitsOnly(value: string) {
+  return value.replace(/\D/g, '')
+}
+
+const fromEnv = (import.meta.env.VITE_WHATSAPP_NUMBER ?? '').trim()
+const whatsappNumber = digitsOnly(fromEnv || DEFAULT_WHATSAPP_NUMBER)
 
 export const APP_CONFIG = {
   name: 'Pegue e Monte ClaraMel',

@@ -9,35 +9,14 @@ Catálogo digital dos temas de Pegue e Monte da ClaraMel: vitrine pública e pai
 
 ## Configuração local
 
-1. Copie o arquivo de exemplo:
-
-```bash
-cp .env.example .env.local
-```
-
-No PowerShell:
-
-```powershell
-Copy-Item .env.example .env.local
-```
-
-2. No [Firebase Console](https://console.firebase.google.com), crie um projeto para a ClaraMel.
-3. Adicione um app **Web** e copie as chaves públicas para `.env.local`:
-
-- `VITE_FIREBASE_API_KEY`
-- `VITE_FIREBASE_AUTH_DOMAIN`
-- `VITE_FIREBASE_PROJECT_ID`
-- `VITE_FIREBASE_STORAGE_BUCKET`
-- `VITE_FIREBASE_MESSAGING_SENDER_ID`
-- `VITE_FIREBASE_APP_ID`
-
-4. `VITE_WHATSAPP_NUMBER` pode ficar vazio. Quando preenchido (somente dígitos, com DDI, ex.: `5511999999999`), os botões de WhatsApp passam a aparecer.
+1. A config pública do Firebase já está em `src/config/firebase-public.ts` (essas chaves web não são secretas; a proteção é pelas regras do Firestore e pelos domínios autorizados).
+2. O WhatsApp da ClaraMel já está em `src/config/app-config.ts`. Os botões **Faça seu orçamento** abrem o `wa.me` com mensagem pré-preenchida. `VITE_WHATSAPP_NUMBER` em `.env.local` só é necessário se quiser sobrescrever o número.
 
 Não versione `.env` nem `.env.local`.
 
 ## Firebase Console
 
-1. Crie o projeto e um app Web (chaves públicas no `.env.local`).
+1. Crie o projeto e um app Web (chaves públicas em `src/config/firebase-public.ts`).
 2. Ative **Authentication → E-mail/senha**. Não habilite cadastro público neste site — o usuário admin é criado só no Console (**Authentication → Users → Add user**).
 3. Crie o banco **Cloud Firestore**.
 4. Publique as regras do arquivo `firestore.rules` na raiz deste repositório (e os índices de `firestore.indexes.json`).
@@ -57,7 +36,7 @@ npm run build
 
 1. `npm run build` deve concluir sem erro.
 2. Importe o repositório na Vercel (framework: Vite).
-3. Configure as mesmas variáveis de `.env.example` no painel da Vercel.
+3. Não é necessário plano Pro nem variáveis de ambiente na Vercel para o Firebase: a config web já vai no build.
 4. O arquivo `vercel.json` faz rewrite SPA (`/(.*)` → `/index.html`) para rotas como `/tema/:slug` após refresh.
 5. Publique `firestore.rules` e `firestore.indexes.json` no Firebase.
 6. Crie o usuário admin no Console (e-mail/senha).
