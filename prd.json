@@ -1,312 +1,135 @@
 {
   "project": "Pegue e Monte ClaraMel",
-  "branchName": "discovery/catalogo-digital-claramel",
-  "description": "Catálogo digital V1: vitrine pública de temas Pegue e Monte e painel admin no Firebase, SPA React + Vite + TypeScript + Tailwind na Vercel.",
+  "branchName": "discovery/admin-crud-destaques",
+  "description": "CRUD completo de temas (incluindo seed), exclusão com confirmação, contador de aluguel no admin e destaques da semana híbridos na home.",
   "targetRepo": null,
-  "sourcePrd": "tasks/prd-catalogo-digital-claramel.md",
+  "sourcePrd": "tasks/prd-admin-crud-destaques.md",
   "userStories": [
     {
       "id": "US-001",
-      "title": "Scaffold Vite React TypeScript Tailwind",
-      "description": "As a developer, I want the web app bootstrapped with Vite, React, TypeScript, Tailwind CSS and React Router so the rest of the V1 can be built on a standard SPA.",
+      "title": "Campos de aluguel, pin semanal e exclusão no modelo Theme",
+      "description": "As a developer, I need rentalCount, weeklyPinned and deleted on Theme/Firestore so later stories can persist admin actions.",
       "acceptanceCriteria": [
-        "Projeto criado na raiz com Vite + React + TypeScript (strict)",
-        "Tailwind CSS configurado e um utilitário de teste (ex.: bg-primary) aplicado em App para confirmar o pipeline",
-        "React Router instalado; npm run build e npm run dev funcionam",
-        ".gitignore ignora node_modules, dist, .env, .env.local",
+        "Theme e ThemeDocument incluem rentalCount: number (default 0), weeklyPinned: boolean (default false) e deleted: boolean (default false)",
+        "mapTheme e initialThemes (via default no mapper) expõem esses campos sem quebrar listagens atuais",
         "Typecheck passes"
       ],
       "priority": 1,
       "passes": true,
-      "notes": "Vite 8 + React 19 + TS strict + Tailwind v4 (@tailwindcss/vite) + React Router. App usa bg-primary. typecheck e build OK."
+      "notes": "Typecheck OK (tsc -b). Verify in browser: MCP de browser indisponível nesta sessão."
     },
     {
       "id": "US-002",
-      "title": "Estrutura modular e rotas esqueleto",
-      "description": "As a developer, I want folders and route placeholders matching the public/admin split so features land in the right place.",
+      "title": "Persistir tema seed no Firestore na primeira mutação",
+      "description": "As an admin, I want seed themes to become Firestore documents on first edit/toggle/delete so changes survive reload and do not reappear after delete.",
       "acceptanceCriteria": [
-        "Pastas criadas: src/assets/{images,logo}, src/components/{common,layout,public,admin}, src/pages/public/{Home,Themes,ThemeDetails}, src/pages/admin/{Login,Dashboard,Themes}, src/services/{firebase,auth,themes}, src/hooks, src/contexts, src/types, src/utils, src/routes",
-        "Rotas declaradas (páginas placeholder com título visível): /, /temas, /tema/:slug, /admin, /admin/login, /admin/themes, /admin/themes/new, /admin/themes/:id/edit",
-        "Não existe API própria nem pasta de backend",
-        "Typecheck passes",
-        "Verify in browser"
+        "Função ensureThemeDocument(theme) faz setDoc com id estável (seed-N ou id Firestore) incluindo campos novos",
+        "listActiveThemes / listAllThemes / getThemeBySlug / getThemeById ignoram documentos com deleted == true e não recolocam o seed correspondente",
+        "Typecheck passes"
       ],
       "priority": 2,
       "passes": true,
-      "notes": "Pastas públicas/admin e rotas placeholder com título visível. Sem pasta de backend. Typecheck OK. Verify in browser indisponível (sem MCP de browser neste ambiente)."
+      "notes": "Typecheck OK (tsc -b). Verify in browser: MCP de browser indisponível nesta sessão."
     },
     {
       "id": "US-003",
-      "title": "Tokens de design, logo e tipografia ClaraMel",
-      "description": "As a visitor, I want the site to look like ClaraMel (logo, candy palette, rounded UI) so the catalog feels commercial and delicate, not generic.",
+      "title": "Excluir tema de verdade com tombstone para seed",
+      "description": "As an admin, I want to permanently remove a theme from catalog and admin list so it does not come back from initialThemes.",
       "acceptanceCriteria": [
-        "Copiar assets/logo.png para src/assets/logo/claramel-logo.png sem recortar, esticar ou recolorir",
-        "Criar src/styles/theme.ts com os tokens ClaraMel (primary, secondary, yellow, sky, orange, background, surface, pinkLight, lavender, grayLight, grayMedium, text, textSecondary, textOnPrimary, title, success, error, warning, info, raios e gradientes)",
-        "tailwind.config estende cores/radius a partir desses tokens; componentes não usam hex solto",
-        "Fontes: Poppins (títulos) e Nunito (corpo), via Google Fonts",
-        "Logo aparece na página placeholder com proporção original",
-        "Typecheck passes",
-        "Verify in browser"
+        "deleteTheme(id) marca deleted: true (e active: false) no documento; se ainda for só seed, persiste antes via ensureThemeDocument",
+        "Tema excluído não aparece em listagens admin nem na vitrine pública",
+        "Typecheck passes"
       ],
       "priority": 3,
       "passes": true,
-      "notes": "Tokens em src/styles/theme.ts, Tailwind estende via tailwind.config.ts, logo em src/assets/logo/claramel-logo.png, Poppins/Nunito. Typecheck OK. Browser MCP indisponível."
+      "notes": "Typecheck OK (tsc -b). Verify in browser: MCP de browser indisponível nesta sessão."
     },
     {
       "id": "US-004",
-      "title": "Configuração central e variáveis de ambiente",
-      "description": "As a developer, I want contact and Firebase settings in one place so values are not copied across components.",
+      "title": "Ajustar contador de aluguel no serviço",
+      "description": "As an admin, I want to increment or decrement a theme's rental count so the hybrid weekly ranking has data.",
       "acceptanceCriteria": [
-        "src/config/app-config.ts exporta APP_CONFIG com name Pegue e Monte ClaraMel, whatsapp vazio, instagram vazio, description curta",
-        "Número de WhatsApp lido de VITE_WHATSAPP_NUMBER (pode ficar vazio); não hardcodar telefone",
-        ".env.example com as chaves VITE_FIREBASE_* e VITE_WHATSAPP_NUMBER (valores vazios)",
-        "README curto explica copiar .env.example para .env.local e colar chaves públicas do Firebase Console",
+        "adjustRentalCount(id, delta) com delta 1 ou -1; resultado nunca menor que 0",
+        "Persiste seed antes se necessário; atualiza updatedAt",
         "Typecheck passes"
       ],
       "priority": 4,
       "passes": true,
-      "notes": "APP_CONFIG em src/config/app-config.ts, WhatsApp via VITE_WHATSAPP_NUMBER, .env.example e README de setup Firebase."
+      "notes": "Typecheck OK (tsc -b). Verify in browser: MCP de browser indisponível nesta sessão."
     },
     {
       "id": "US-005",
-      "title": "Cliente Firebase e tipo Theme",
-      "description": "As a developer, I need the Firebase SDK initialized and a typed Theme model so public and admin features share one contract.",
+      "title": "Lista híbrida de destaques da semana",
+      "description": "As a customer, I want the home to show up to 9 weekly highlights chosen by admin pins then rental count so the portfolio feels curated.",
       "acceptanceCriteria": [
-        "src/services/firebase/firebase.ts inicializa app, Auth e Firestore a partir de import.meta.env",
-        "Tipo Theme em src/types com id, name, slug, description, category?, coverImage, images, active, order, createdAt, updatedAt",
-        "Nenhuma service account, senha ou chave privada no frontend",
+        "listWeeklyHighlights() retorna até 9 temas ativos e não deletados",
+        "Ordem: weeklyPinned === true primeiro (desempate: rentalCount desc, depois order asc); em seguida não-pinados pelo mesmo desempate; se ainda faltar, preenche pelos demais ativos por order",
         "Typecheck passes"
       ],
       "priority": 5,
       "passes": true,
-      "notes": "Firebase Auth/Firestore inicializados via env; tipo Theme em src/types. Sem service account no frontend."
+      "notes": "Typecheck OK (tsc -b). Verify in browser: MCP de browser indisponível nesta sessão."
     },
     {
       "id": "US-006",
-      "title": "ImageService com compressão e limite de documento",
-      "description": "As an admin, I want selected photos compressed in the browser so Firestore documents stay under the 1 MiB limit.",
+      "title": "CRUD na lista admin para todos os temas",
+      "description": "As an admin, I want Edit, Enable/Disable and Delete on every theme (including seed) so I can fully manage the catalog.",
       "acceptanceCriteria": [
-        "src/services/themes/image-service.ts expõe validateImage, compressImage, convertToBase64 e estimatePayloadSize",
-        "Fluxo: validar tipo (jpeg/png/webp) → redimensionar max 1600px → comprimir (WebP com fallback JPEG) → Base64; não guardar o arquivo original",
-        "Máximo 8 imagens por tema; recusar o 9º com mensagem amigável",
-        "Alvo ~100 KB por imagem; recusar se uma imagem comprimida passar de ~250 KB ou se o payload estimado do documento passar de 900 KB",
-        "Mensagem de erro amigável quando o arquivo não puder ser processado",
-        "Preferir Canvas API; não instalar biblioteca pesada sem necessidade",
-        "Typecheck passes"
+        "Remover o bloqueio Catálogo inicial / seed-* sem ações",
+        "Editar abre /admin/themes/:id/edit e salva nome, descrição e imagens (persistindo seed)",
+        "Habilitar/Desabilitar altera active e some/volta na vitrine",
+        "Excluir pede confirmação com texto claro; confirmação chama deleteTheme e recarrega a lista",
+        "Layout da lista empilha foto/ações no mobile; botões min-h-12",
+        "Typecheck passes",
+        "Verify in browser"
       ],
       "priority": 6,
       "passes": true,
-      "notes": "ImageService com Canvas, WebP/JPEG, máx. 8 imagens, teto 250 KB/imagem e 900 KB de payload."
+      "notes": "Typecheck OK (tsc -b). Verify in browser: MCP de browser indisponível nesta sessão."
     },
     {
       "id": "US-007",
-      "title": "Serviço Firestore de temas",
-      "description": "As a developer, I want a themes service that creates slugs, timestamps and ordered queries so pages never talk to Firestore directly.",
+      "title": "Botões +1 e −1 do contador na lista admin",
+      "description": "As an admin, I want +1/−1 on each theme row so I can record rentals without typing.",
       "acceptanceCriteria": [
-        "src/services/themes/themes-service.ts com listar ativos, listar todos, obter por slug, obter por id, criar, atualizar, inativar",
-        "Slug gerado do name (minúsculas, hífens); colisão resolve com sufixo -2, -3",
-        "Público: query active == true, ordenar order ASC e empate createdAt DESC",
-        "createdAt/updatedAt via serverTimestamp()",
-        "Componentes não importam firebase/firestore diretamente; só o serviço",
-        "Typecheck passes"
+        "Cada item da lista admin mostra Aluguéis: N e botões +1 e −1",
+        "−1 desabilitado quando contador é 0; +1/−1 persistem e atualizam a linha",
+        "Typecheck passes",
+        "Verify in browser"
       ],
       "priority": 7,
       "passes": true,
-      "notes": "themes-service com listagens, slug único, serverTimestamp e inativação. Páginas não importam firebase/firestore."
+      "notes": "Typecheck OK (tsc -b). Verify in browser: MCP de browser indisponível nesta sessão."
     },
     {
       "id": "US-008",
-      "title": "Regras de segurança do Firestore",
-      "description": "As a product owner, I want Firestore rules that let anyone read active themes and only signed-in users write, so the public site cannot create or edit data.",
+      "title": "Fixar tema como destaque da semana no admin",
+      "description": "As an admin, I want to pin/unpin a theme as weekly highlight so I can override the automatic ranking.",
       "acceptanceCriteria": [
-        "Arquivo firestore.rules na raiz versionado",
-        "Leitura pública apenas de documentos themes com active == true; admin autenticado lê todos",
-        "Create/update/delete somente se request.auth != null",
-        "Proibido allow read, write: if true",
-        "README documenta criar projeto Firebase, Auth e-mail/senha, publicar regras e criar usuário admin no Console",
+        "Ação na lista admin Destacar / Remover destaque altera weeklyPinned",
+        "Estado visível na linha (selo Destaque)",
         "Typecheck passes",
-        "Documentation complete"
+        "Verify in browser"
       ],
       "priority": 8,
       "passes": true,
-      "notes": "firestore.rules: leitura pública só de temas ativos; escrita autenticada. README do Console atualizado."
+      "notes": "Typecheck OK (tsc -b). Verify in browser: MCP de browser indisponível nesta sessão."
     },
     {
       "id": "US-009",
-      "title": "Login administrativo com Firebase Auth",
-      "description": "As an admin, I want to sign in with email and password at /admin/login so only ClaraMel staff can manage themes.",
+      "title": "Home com Destaques da semana no lugar dos 9 primeiros",
+      "description": "As a customer, I want the home catalog block to show weekly highlights (not the first 9 by order) on a responsive layout.",
       "acceptanceCriteria": [
-        "Página /admin/login com campos E-mail, Senha e botão Entrar; logo ClaraMel visível",
-        "Loading no submit; erros amigáveis (credencial inválida, rede) — nunca FirebaseError na UI",
-        "Não existe tela de cadastro público; não há link criar conta",
-        "Sucesso redireciona para /admin",
+        "A seção da home que hoje usa FEATURED_COUNT = 9 passa a usar listWeeklyHighlights() e o título Destaques da semana",
+        "Link Ver todos continua indo para /temas; /temas lista todos os ativos",
+        "Grid e hero permanecem responsivos; CTAs min-h-12",
+        "Contador de aluguel e controles de pin não aparecem na vitrine pública",
         "Typecheck passes",
         "Verify in browser"
       ],
       "priority": 9,
       "passes": true,
-      "notes": "Login e-mail/senha, erros amigáveis, sem cadastro público. Typecheck OK. Browser MCP indisponível."
-    },
-    {
-      "id": "US-010",
-      "title": "Rotas admin protegidas, layout e logout",
-      "description": "As an admin, I want /admin/* (exceto login) blocked when I am logged out, and a simple shell with logout, so the panel is not reachable anonymously.",
-      "acceptanceCriteria": [
-        "Acesso a /admin, /admin/themes, /admin/themes/new, /admin/themes/:id/edit sem sessão redireciona para /admin/login",
-        "Layout admin com logo, navegação (Dashboard, Temas) e botão Sair",
-        "Logout limpa a sessão e volta para /admin/login",
-        "Typecheck passes",
-        "Verify in browser"
-      ],
-      "priority": 10,
-      "passes": true,
-      "notes": "ProtectedRoute + AdminLayout com Dashboard, Temas e Sair. Typecheck OK. Browser MCP indisponível."
-    },
-    {
-      "id": "US-011",
-      "title": "Dashboard com totais de temas",
-      "description": "As an admin, I want /admin to show total, active and inactive theme counts so I see catalog health at a glance.",
-      "acceptanceCriteria": [
-        "Três cards: total, ativos, inativos (sem gráficos)",
-        "Estados loading / erro amigável / zeros quando não há temas",
-        "Typecheck passes",
-        "Verify in browser"
-      ],
-      "priority": 11,
-      "passes": true,
-      "notes": "Cards total/ativos/inativos com loading e erro. Typecheck OK. Browser MCP indisponível."
-    },
-    {
-      "id": "US-012",
-      "title": "Listagem admin e inativação de tema",
-      "description": "As an admin, I want /admin/themes to list every theme with edit and activate/deactivate actions so I can hide a theme from the public catalog without deleting it.",
-      "acceptanceCriteria": [
-        "Lista mobile-first com capa, nome, categoria, status, ordem, ações",
-        "Botão + Novo tema vai para /admin/themes/new",
-        "Ação Editar vai para /admin/themes/:id/edit",
-        "Ação Ativar/Inativar persiste active e o tema inativo some do catálogo público",
-        "Não existe botão Excluir nem exclusão definitiva nesta V1",
-        "Typecheck passes",
-        "Verify in browser"
-      ],
-      "priority": 12,
-      "passes": true,
-      "notes": "Lista admin com editar e ativar/inativar; sem exclusão definitiva. Typecheck OK. Browser MCP indisponível."
-    },
-    {
-      "id": "US-013",
-      "title": "Cadastro de tema com imagens e capa",
-      "description": "As an admin, I want to create a theme with compressed images, cover and order so it can appear in the public catalog when active.",
-      "acceptanceCriteria": [
-        "Formulário em /admin/themes/new: Nome *, Descrição *, Categoria opcional, Ativo, Ordem",
-        "Upload: desktop com dropzone + selecionar imagens; mobile usa input file nativo; preview com remover e indicador de capa",
-        "Primeira imagem vira capa automaticamente; admin pode marcar outra como capa",
-        "Salvar chama ImageService + themes-service; slug gerado; redirect para /admin/themes em sucesso",
-        "Validação: nome e descrição obrigatórios; pelo menos 1 imagem; máximo 8; recusar payload > 900 KB",
-        "Typecheck passes",
-        "Verify in browser"
-      ],
-      "priority": 13,
-      "passes": true,
-      "notes": "Formulário novo tema com dropzone, capa e compressão. Typecheck OK. Browser MCP indisponível."
-    },
-    {
-      "id": "US-014",
-      "title": "Edição de tema existente",
-      "description": "As an admin, I want to edit a theme at /admin/themes/:id/edit so I can change copy, cover, gallery and order without recreating it.",
-      "acceptanceCriteria": [
-        "Formulário pré-preenchido; imagens existentes preservadas até o admin remover",
-        "Permite adicionar imagens, remover, trocar capa e alterar ordem/status/categoria",
-        "updatedAt atualiza; slug só regenera se o nome mudar e o novo slug estiver livre",
-        "Typecheck passes",
-        "Verify in browser"
-      ],
-      "priority": 14,
-      "passes": true,
-      "notes": "Edição pré-preenchida; slug só muda se o novo estiver livre. Typecheck OK. Browser MCP indisponível."
-    },
-    {
-      "id": "US-015",
-      "title": "Layout público, header, footer e Home",
-      "description": "As a customer, I want a branded home page with header, hero and footer so I understand ClaraMel and can reach the catalog.",
-      "acceptanceCriteria": [
-        "Header público: logo, nome/marca, nav Início e Temas; no mobile menu compacto",
-        "Botão de WhatsApp no header somente se o número não estiver vazio",
-        "Home / com hero Pegue e Monte ClaraMel, subtítulo e CTA Ver nossos temas → /temas",
-        "Footer: logo, Pegue e Monte ClaraMel, © ClaraMel; Instagram só se configurado",
-        "Typecheck passes",
-        "Verify in browser"
-      ],
-      "priority": 15,
-      "passes": true,
-      "notes": "Header, hero e footer ClaraMel; WhatsApp oculto se vazio. Typecheck OK. Browser MCP indisponível."
-    },
-    {
-      "id": "US-016",
-      "title": "Catálogo público com cards, busca e ordenação",
-      "description": "As a customer, I want /temas to show active theme cards I can search so I can find a party theme quickly on my phone.",
-      "acceptanceCriteria": [
-        "Grid: 1 coluna mobile, 2 tablet, 3 desktop; card com capa, nome, categoria (se houver), link Ver tema",
-        "Campo Buscar tema... filtra no frontend por nome e categoria (case-insensitive)",
-        "Somente active === true; ordem order ASC, empate createdAt DESC",
-        "Capa com lazy loading; não carregar galeria completa na listagem",
-        "Estados: Carregando temas..., Nenhum tema encontrado., Não foi possível carregar os temas.",
-        "Typecheck passes",
-        "Verify in browser"
-      ],
-      "priority": 16,
-      "passes": true,
-      "notes": "Catálogo em grid com busca local e lazy loading da capa. Typecheck OK. Browser MCP indisponível."
-    },
-    {
-      "id": "US-017",
-      "title": "Detalhes do tema e galeria",
-      "description": "As a customer, I want /tema/:slug with a gallery so I can inspect the decoration before contacting ClaraMel.",
-      "acceptanceCriteria": [
-        "Exibe nome, descrição, categoria (se houver), imagem principal, galeria, botão voltar para /temas",
-        "Trocar imagem principal ao clicar/tocar um thumb; lightbox/ampliar; setas ou swipe no mobile",
-        "alt descritivo em cada imagem (pelo menos o nome do tema)",
-        "Tema inativo ou slug inexistente: mensagem amigável + link para o catálogo",
-        "Title da página: {nome} | Pegue e Monte ClaraMel",
-        "Typecheck passes",
-        "Verify in browser"
-      ],
-      "priority": 17,
-      "passes": true,
-      "notes": "Detalhe com galeria, lightbox, swipe e title SEO. Typecheck OK. Browser MCP indisponível."
-    },
-    {
-      "id": "US-018",
-      "title": "CTA WhatsApp condicional e estados globais",
-      "description": "As a customer, I want a Quero saber mais button that opens WhatsApp with the theme name when a number is configured, and I want that button hidden while the number is empty.",
-      "acceptanceCriteria": [
-        "Helper único gera https://wa.me/{numero}?text= com texto Olá! Gostaria de saber mais sobre o tema \"{nome}\".",
-        "CTA Quero saber mais na página de detalhes somente se o número não for string vazia",
-        "Header/footer também ocultam WhatsApp/Instagram quando vazios",
-        "Erros técnicos do Firebase nunca aparecem na UI",
-        "Typecheck passes",
-        "Verify in browser"
-      ],
-      "priority": 18,
-      "passes": true,
-      "notes": "Helper wa.me; CTA oculto sem número; erros Firebase não vazam na UI. Typecheck OK. Browser MCP indisponível."
-    },
-    {
-      "id": "US-019",
-      "title": "SEO básico, acessibilidade e deploy Vercel",
-      "description": "As ClaraMel, I want the SPA deployable on Vercel with basic SEO and accessible controls so the catalog can go live on a custom domain later.",
-      "acceptanceCriteria": [
-        "index.html: title, meta description, favicon a partir da logo, Open Graph básico",
-        "Formulários com label associado; botões nativos; foco visível; área de toque adequada no mobile",
-        "vercel.json com rewrite SPA /(.*) → /index.html",
-        "README: checklist de deploy (build, env na Vercel, regras Firestore, usuário admin, Auth no domínio)",
-        "npm run build conclui sem erro",
-        "Typecheck passes",
-        "Verify in browser"
-      ],
-      "priority": 19,
-      "passes": true,
-      "notes": "SEO/OG, vercel.json SPA rewrite, README de deploy; npm run build OK. Browser MCP indisponível."
+      "notes": "Typecheck OK (tsc -b). Verify in browser: MCP de browser indisponível nesta sessão."
     }
   ]
 }

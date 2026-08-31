@@ -1,1 +1,3 @@
 tasks/prd-catalogo-digital-claramel.md
+tasks/prd-admin-crud-destaques.md
+

@@ -18,6 +18,9 @@ export type Theme = {
   images: string[]
   active: boolean
   order: number
+  rentalCount: number
+  weeklyPinned: boolean
+  deleted: boolean
   createdAt: Date | null
   updatedAt: Date | null
 }

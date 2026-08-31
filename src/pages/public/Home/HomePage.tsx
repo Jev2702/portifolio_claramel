@@ -1,15 +1,41 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ThemeGrid } from '../../../components/public/ThemeGrid.tsx'
 import { WhatsAppQuoteButton } from '../../../components/public/WhatsAppQuoteButton.tsx'
 import { APP_CONFIG } from '../../../config/app-config.ts'
-import { useActiveThemes } from '../../../hooks/use-active-themes.ts'
+import { listWeeklyHighlights } from '../../../services/themes/themes-service.ts'
 import { claramelGradients } from '../../../styles/theme.ts'
-
-const FEATURED_COUNT = 9
+import type { Theme } from '../../../types/theme.ts'
+import { toUserMessage } from '../../../utils/user-messages.ts'
 
 export function HomePage() {
-  const { themes, error } = useActiveThemes()
-  const featured = themes?.slice(0, FEATURED_COUNT) ?? []
+  const [highlights, setHighlights] = useState<Theme[] | null>(null)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    let cancelled = false
+    listWeeklyHighlights()
+      .then((items) => {
+        if (!cancelled) {
+          setHighlights(items)
+        }
+      })
+      .catch((cause: unknown) => {
+        if (import.meta.env.DEV) {
+          console.error(cause)
+        }
+        if (!cancelled) {
+          toUserMessage(cause)
+          setError('Não foi possível carregar os temas. Tente novamente.')
+          setHighlights([])
+        }
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const featured = highlights ?? []
 
   return (
     <main>
@@ -62,13 +88,13 @@ export function HomePage() {
         <div className="flex flex-wrap items-end justify-between gap-4 mb-10">
           <div>
             <p className="text-secondary text-sm font-semibold uppercase tracking-wider">Catálogo</p>
-            <h2 className="font-heading text-title text-3xl tracking-tight mt-1">Nossos temas</h2>
+            <h2 className="font-heading text-title text-3xl tracking-tight mt-1">Destaques da semana</h2>
           </div>
           <Link to="/temas" className="text-primary font-semibold min-h-12 inline-flex items-center">
             Ver todos
           </Link>
         </div>
-        {themes === null ? <p className="text-textSecondary">Carregando temas...</p> : null}
+        {highlights === null ? <p className="text-textSecondary">Carregando temas...</p> : null}
         {error ? (
           <p role="alert" className="text-error">
             {error}

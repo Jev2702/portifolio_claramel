@@ -1,6 +1,6 @@
 import type { Theme } from '../types/theme.ts'
 
-export const initialThemes: Theme[] = [
+const seedCatalog: Array<Omit<Theme, 'rentalCount' | 'weeklyPinned' | 'deleted'>> = [
   {
     "id": "seed-1",
     "name": "Tema 1",
@@ -954,3 +954,10 @@ export const initialThemes: Theme[] = [
     "updatedAt": null
   }
 ]
+
+export const initialThemes: Theme[] = seedCatalog.map((theme) => ({
+  ...theme,
+  rentalCount: 0,
+  weeklyPinned: false,
+  deleted: false,
+}))

@@ -1,70 +1,42 @@
-# Progress — Catálogo Digital Pegue e Monte ClaraMel
-# Branch: discovery/catalogo-digital-claramel
-# Source: tasks/prd-catalogo-digital-claramel.md
+# Progress — CRUD admin, contador de aluguel e destaques da semana
+# Branch: discovery/admin-crud-destaques
+# Source: tasks/prd-admin-crud-destaques.md
 
-## [US-001] Scaffold Vite React TypeScript Tailwind — DONE
-- Scaffold Vite na raiz, Tailwind v4 com `bg-primary`, React Router instalado
-- `.gitignore` ignora `node_modules`, `dist`, `.env`, `.env.local`; typecheck e build passaram
+## [US-001] Campos de aluguel, pin semanal e exclusão no modelo Theme — DONE
+- Theme, mapper e seeds com rentalCount, weeklyPinned e deleted (default 0/false)
+- Typecheck OK
 
-## [US-002] Estrutura modular e rotas esqueleto — DONE
-- Pastas e rotas `/`, `/temas`, `/tema/:slug`, `/admin`, `/admin/login`, `/admin/themes`, `/admin/themes/new`, `/admin/themes/:id/edit`
-- Sem backend/API; typecheck OK; verificação visual em browser MCP indisponível
+## [US-002] Persistir tema seed no Firestore na primeira mutação — DONE
+- ensureThemeDocument com setDoc no id estável; merge ignora deleted e exclusões públicas
+- Typecheck OK
 
-## [US-003] Tokens de design, logo e tipografia ClaraMel — DONE
-- `src/styles/theme.ts` + `tailwind.config.ts`; logo oficial; Poppins e Nunito
+## [US-003] Excluir tema de verdade com tombstone para seed — DONE
+- deleteTheme marca deleted/active false e grava config/catalog (excludedIds/slugs)
+- Typecheck OK
+
+## [US-004] Ajustar contador de aluguel no serviço — DONE
+- adjustRentalCount +1/−1 com mínimo 0; persiste seed antes
+- Typecheck OK
+
+## [US-005] Lista híbrida de destaques da semana — DONE
+- listWeeklyHighlights: pins, depois rentalCount, corte em 9
+- Typecheck OK
+
+## [US-006] CRUD na lista admin para todos os temas — DONE
+- Editar/Habilitar/Excluir em todos os temas; confirm no excluir; lista responsiva
 - Typecheck OK; browser MCP indisponível
 
-## [US-004] Configuração central e variáveis de ambiente — DONE
-- `APP_CONFIG`, `.env.example` e README com cópia para `.env.local`
-- WhatsApp lido de `VITE_WHATSAPP_NUMBER`, sem telefone hardcoded
+## [US-007] Botões +1 e −1 do contador na lista admin — DONE
+- Aluguéis visível só no admin; −1 desabilitado em 0
+- Typecheck OK; browser MCP indisponível
 
-## [US-005] Cliente Firebase e tipo Theme — DONE
-- `src/services/firebase/firebase.ts` e tipo `Theme` em `src/types`
-- SDK público apenas; typecheck OK
+## [US-008] Fixar tema como destaque da semana no admin — DONE
+- Destacar / Remover destaque + selo Destaque
+- Typecheck OK; browser MCP indisponível
 
-## [US-006] ImageService com compressão e limite de documento — DONE
-- Canvas API, WebP com fallback JPEG, limites de 8 imagens / 250 KB / 900 KB
+## [US-009] Home com Destaques da semana no lugar dos 9 primeiros — DONE
+- Home usa listWeeklyHighlights; /temas permanece catálogo completo; sem contador no público
+- Typecheck OK; browser MCP indisponível
 
-## [US-007] Serviço Firestore de temas — DONE
-- CRUD/inativação, slug com sufixo em colisão, timestamps no servidor
-
-## [US-008] Regras de segurança do Firestore — DONE
-- `firestore.rules` + README de publicação; sem `allow read, write: if true`
-
-## [US-009] Login administrativo com Firebase Auth — DONE
-- `/admin/login` com e-mail/senha, loading e erros amigáveis; sem cadastro público
-
-## [US-010] Rotas admin protegidas, layout e logout — DONE
-- `ProtectedRoute` + `AdminLayout` (Dashboard, Temas, Sair)
-
-## [US-011] Dashboard com totais de temas — DONE
-- Cards total / ativos / inativos com loading e erro
-
-## [US-012] Listagem admin e inativação de tema — DONE
-- Lista com editar e ativar/inativar; sem exclusão definitiva
-
-## [US-013] Cadastro de tema com imagens e capa — DONE
-- Formulário, dropzone, capa automática e compressão via ImageService
-
-## [US-014] Edição de tema existente — DONE
-- Formulário pré-preenchido; slug só muda se o novo estiver livre
-
-## [US-015] Layout público, header, footer e Home — DONE
-- Header/footer ClaraMel, hero e CTA para `/temas`; WhatsApp oculto se vazio
-
-## [US-016] Catálogo público com cards, busca e ordenação — DONE
-- Grid responsivo, busca local, lazy loading da capa
-
-## [US-017] Detalhes do tema e galeria — DONE
-- Galeria, lightbox, swipe e title `{nome} | Pegue e Monte ClaraMel`
-
-## [US-018] CTA WhatsApp condicional e estados globais — DONE
-- Helper `wa.me`; CTA oculto sem número; erros Firebase não vazam na UI
-
-## [US-019] SEO básico, acessibilidade e deploy Vercel — DONE
-- `index.html` SEO/OG, `vercel.json` rewrite, README de deploy; `npm run build` OK
-
-## COMPLETE — 2026-08-21
-- Todas as 19 stories com `passes: true`
-- Branch: discovery/catalogo-digital-claramel
-
+## COMPLETE
+- 2026-08-31 — todas as stories passes: true
